@@ -38,7 +38,7 @@ class elasticsearch::install(
     path      => ['/usr/bin'],
     cwd       => $install_root,
     user      => root,
-		command => "wget -c https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz && /bin/tar xzf elasticsearch-${version}.tar.gz && /bin/mv elasticsearch-${version} elasticsearch"
+		command => "wget -c https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz && /bin/tar xzf elasticsearch-${version}.tar.gz && /bin/mv elasticsearch-${version} elasticsearch",
     creates   => "${install_root}/elasticsearch",
   }
 
