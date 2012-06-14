@@ -3,11 +3,11 @@
 # https://github.com/Aethylred/puppet-elasticsearch
 
 class elasticsearch(
-  $version      = "0.19.2",
+  $version      = "0.19.4",
   $install_root = "/opt"
 ){
   case $operatingsystem{
-    CentOS:{
+    CentOS,Amazon:{
       class{'elasticsearch::install':
         version       => $version,
         install_root  => $install_root,
@@ -21,7 +21,7 @@ class elasticsearch(
 }
 
 class elasticsearch::install(
-  $version      = "0.19.2",
+  $version      = "0.19.4",
   $install_root = "/opt",
   $git_package = "git-core"
 ){
@@ -38,7 +38,7 @@ class elasticsearch::install(
     path      => ['/usr/bin'],
     cwd       => $install_root,
     user      => root,
-    command   => "git clone git://github.com/elasticsearch/elasticsearch.git elasticsearch&& cd elasticsearch&& git checkout v${version}",
+		command => "wget -c https://github.com/downloads/elasticsearch/elasticsearch/elasticsearch-${version}.tar.gz && /bin/tar xzf elasticsearch-${version}.tar.gz && /bin/mv elasticsearch-${version} elasticsearch"
     creates   => "${install_root}/elasticsearch",
   }
 
@@ -51,15 +51,6 @@ class elasticsearch::install(
     creates => "${install_root}/elasticsearch/bin/service",
   }
 
-  #file{'link_elasticsearch_wrapper':
-  #  ensure  => link,
-  #  require => Exec['install_servicewrapper'],
-  #  owner   => root,
-  #  group   => root,
-  #  path    => "${install_root}/elasticsearch/bin/service",
-  #  target  => "${install_root}/elasticsearch-servicewrapper/service",
-  #}
-
   file{'link_elasticsearch_service':
     ensure  => link,
     require => Exec['install_servicewrapper'],
@@ -67,6 +58,11 @@ class elasticsearch::install(
     group   => root,
     path    => '/etc/init.d/elasticsearch',
     target  => "${install_root}/elasticsearch/bin/service/elasticsearch",
+  }
+
+	file { "${install_root}/elasticsearch/bin/service/elasticsearch.conf":
+		require => File['link_elasticsearch_service'],
+		source => "puppet:///elasticsearch/elasticsearch.conf",
   }
 
   service{'elasticsearch':
