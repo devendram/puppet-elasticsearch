@@ -66,7 +66,7 @@ class elasticsearch::install(
   }
 
   service{'elasticsearch':
-    require => File['link_elasticsearch_service'],
+    require => File["${install_root}/elasticsearch/bin/service/elasticsearch.conf"],
     ensure => running,
     enable => true,
     hasstatus => true,
